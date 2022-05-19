@@ -1,4 +1,3 @@
-OUTPUT_FORMAT("elf32-i386")
 ENTRY (_start)
 
 SECTIONS
@@ -22,7 +21,7 @@ SECTIONS
 	/* Add a symbol that indicates the start address of the kernel. */
 	.text ALIGN (4K) : AT (ADDR (.text) - 0xC0000000)
 	{
-		*(.multiboot)
+		*(.text)
 	}
 	.rodata ALIGN (4K) : AT (ADDR (.rodata) - 0xC0000000)
 	{

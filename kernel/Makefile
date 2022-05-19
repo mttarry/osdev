@@ -30,7 +30,11 @@ LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 KERNEL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
-kernel/paging.o
+kernel/paging.o \
+kernel/pfa.o \
+kernel/serial.o \
+debug_utils/printf.o \
+debug_utils/itoa.o
 
 OBJS=\
 $(ARCHDIR)/crti.o \
