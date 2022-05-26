@@ -1,6 +1,15 @@
 /* INCLUDES */
 #include <stdint.h>
 #include <stddef.h>
+#include <kernel/pfa.h>
+
+extern uint32_t* bitmap;
+extern uint32_t bitmap_size;
+
+#define PAGE_SIZE 4096
+
+#define ALIGN(addr)				((((uint32_t)(addr) & 0xFFFFF000)) + 0x1000)
+#define IS_ALIGNED(addr)    	(((uint32_t)(addr)  & 0xFFF) == 0)
 
 
 typedef struct page_directory_entry {
@@ -37,3 +46,6 @@ typedef struct page_table {
 typedef struct page_directory {
 	page_directory_entry_t tables[1024];
 } page_directory_t;
+
+
+void paging_init();

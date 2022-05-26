@@ -1,6 +1,2 @@
-
-First free block is 0
-First allocated block at address 0
-First free block is 1
-First allocated block at address 1
-First free block is 0
+Initializing COM1 serial port...
+Initializing page frame allocator...

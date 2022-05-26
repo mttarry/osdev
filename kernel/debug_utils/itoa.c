@@ -4,7 +4,7 @@
 
 void reverse(char str[], int length)
 {
-	for (int i = 0, j = length - 1; i < length / 2; ++i) {
+	for (int i = 0, j = length - 1; i < length / 2; ++i, --j) {
 		char tmp = str[i];
 		str[i] = str[j];
 		str[j] = tmp;
@@ -35,8 +35,9 @@ void itoa(int num, char* str, int base)
     while (num != 0)
     {
         int rem = num % base;
-        str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';
-        num = num/base;
+        if (base == 16 && rem < 0) rem = -rem;
+        str[i++] = (rem > 9) ? (rem-10) + 'a' : rem + '0';
+        num = num / base;
     }
  
     // If number is negative, append '-'

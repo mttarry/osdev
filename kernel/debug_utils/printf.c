@@ -18,6 +18,7 @@ void vsprintf_helper(char *str, void (*putchar)(char), const char *format, uint3
 	char buf[512];
 	int sign = 0;
 	memset(buf, 0, 512);
+	uint32_t base;
 
 	while((c = *format++) != 0x0) {
 		sign = 0;
@@ -28,64 +29,60 @@ void vsprintf_helper(char *str, void (*putchar)(char), const char *format, uint3
 
 			}
 			else {
-
 				switch(c) {
 					case 'p':
 					case 'd':
-						uval = ival = va_arg(arg, int);
-						if (ival < 0) sign = 1;
-						itoa(uval, buf, 10);
-						uint32_t len = strlen(buf);
-
-						if (str) {
-							for (uint32_t i = 0; i < len; ++i) {
-								*(str + *pos) = buf[i];
-								*pos = *pos + 1;
-							} 
-							// TODO
+						if (c == 'd' || c == 'u') {
+							base = 10;
 						}
 						else {
-
-							char *t = buf;
-
-							if (sign) {
-								putchar('-');
-							}
-							while (*t) {
-								putchar(*t++);
-							}
+							base = 16;
 						}
+
+						uval = ival = va_arg(arg, int);
+						if (c == 'd' && ival < 0) {
+							sign = 1;
+							uval = -ival;
+						}
+						itoa(uval, buf, base);
+
+						char *t = buf;
+
+						if (c == 'd' && sign) {
+							putchar('-');
+						}
+						while (*t) {
+							putchar(*t++);
+						}
+					
 
 						break;
 
 
 					case 'i':
 						break;
-					case 'c':
 
+					case 's':
+					{
+					 	char* st = va_arg(arg, char*);
+					 	uint32_t len = strlen(st);
+					 	memcpy(buf, st, len);
+					 	for (int i = 0; i < len; ++i) {
+					 		putchar(buf[i]);
+					 	}
+					 }
+					 	break;
+					case 'c':
+						break;
 					default:
 						break;
-
-
 				}
-
 				continue;
 			}
-			
-
-		}
-		if (str) {
-			*(str + *pos) = c;
-			*pos = *pos + 1;
-		}
-		else {
-			(*putchar)(c);
 		}
 
-
-	}
-
-	
+		(*putchar)(c);
+	}	
 }
 
 void vsprintf(char *str, void (*putchar)(char), const char *format, va_list arg) {

@@ -1,7 +1,6 @@
 #include <kernel/pfa.h>
 
 
-
 uint32_t *bitmap = (uint32_t*) &(_kernel_end);
 uint32_t bitmap_size;
 uint32_t total_blocks;
