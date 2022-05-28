@@ -44,7 +44,12 @@ void vsprintf_helper(char *str, void (*putchar)(char), const char *format, uint3
 							sign = 1;
 							uval = -ival;
 						}
-						itoa(uval, buf, base);
+						if (c == 'p') {
+							utoa(uval, buf, base);
+						}
+						else {
+							itoa(uval, buf, base);
+						}
 
 						char *t = buf;
 

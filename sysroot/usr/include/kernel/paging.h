@@ -5,6 +5,7 @@
 
 extern uint32_t* bitmap;
 extern uint32_t bitmap_size;
+extern uint32_t *mem_start;
 
 #define PAGE_SIZE 4096
 

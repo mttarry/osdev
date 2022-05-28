@@ -49,3 +49,29 @@ void itoa(int num, char* str, int base)
     // Reverse the string
     reverse(str, i);
  }
+
+ void utoa(uint32_t num, char* str, int base)
+{
+    int i = 0;
+ 
+    /* Handle 0 explicitly, otherwise empty string is printed for 0 */
+    if (num == 0)
+    {
+        str[i++] = '0';
+        str[i] = '\0';
+    }
+
+    // Process individual digits
+    while (num != 0)
+    {
+        uint32_t rem = num % base;
+        str[i++] = (rem > 9)? (rem-10) + 'a' : rem + '0';
+        num = num/base;
+    }
+ 
+    str[i] = '\0'; // Append string terminator
+
+    // Reverse the string
+    reverse(str, i);
+
+}
