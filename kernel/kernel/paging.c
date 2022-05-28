@@ -15,17 +15,42 @@ void * dumb_kmalloc(uint32_t size, int align) {
     return ret;
 }
 
+void clearPageDir() {
+	for (int i = 0; i < PAGING_STRUCTURE_SIZE; ++i) {
+		// flags: supervisor mode; r/w enable; not present
+		page_directory_entry_t entry;
+		entry.read_write = 1;
+		page_directory->tables[i] = entry;
+	}
+}
+
+// Map all 4 MB
+void addPageTable(uint32_t pageDirIdx) {
+	page_table_t page_table;
+	for (int i = 0; i < PAGING_STRUCTURE_SIZE; ++i) {
+		// frame is page start addr, supervisor level, read/write, present
+		page_table.tables[i].frame = (i * 0x1000);
+		page_table.tables[i].read_write = 1; 
+		page_table.tables[i].present = 1;
+	}
+
+	page_directory->tables[pageDirIdx].frame = ?
+	page_directory->tables[pageDirIdx].present = 1;
+	page_directory->tables[pageDirIdx].read_write = 1;
+}
+
 
 void paging_init() {
 	// reserve paging structures after pfa bitmap
 	temp_mem = bitmap + bitmap_size;
 
-	//page_directory = dumb_kmalloc(sizeof(page_directory_t), 1);
-	page_directory = (page_directory_t*) (mem_start + allocate_block() * 0x1000);
+	page_directory = dumb_kmalloc(sizeof(page_directory_t), 1);
 
-	printf("Page dir at %p\n", &page_directory);
+	printf("Page dir at %p\n", page_directory);
 
-	//memset(page_directory, 0, sizeof(page_directory_t));
+	clearPageDir();
+
+	addPageTable(0);
 
 
 

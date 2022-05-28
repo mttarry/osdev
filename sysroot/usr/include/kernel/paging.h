@@ -8,6 +8,7 @@ extern uint32_t bitmap_size;
 extern uint32_t *mem_start;
 
 #define PAGE_SIZE 4096
+#define PAGING_STRUCTURE_SIZE 1024
 
 #define ALIGN(addr)				((((uint32_t)(addr) & 0xFFFFF000)) + 0x1000)
 #define IS_ALIGNED(addr)    	(((uint32_t)(addr)  & 0xFFF) == 0)
