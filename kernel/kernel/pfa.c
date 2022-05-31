@@ -11,8 +11,7 @@ void pfa_init(uint32_t mem_size) {
 
 	total_blocks = mem_size / BLOCK_SIZE;
 	bitmap_size = total_blocks / BLOCKS_PER_GROUP;
-
-	memset(bitmap, 0, bitmap_size);	
+	memset(bitmap, 0, bitmap_size * sizeof(uint32_t));	
 
 	mem_start = (uint32_t*)BLOCK_ALIGN(((uint32_t)bitmap + bitmap_size));
 }
@@ -29,10 +28,10 @@ uint32_t find_free_block() {
 }
 
 
-uint32_t allocate_block() {
+uint32_t * allocate_block() {
 	uint32_t free_block = find_free_block();
 	SETBIT(free_block);
-	return free_block;
+	return (uint32_t *)(free_block << PAGE_OFFSET_BITS);
 }
 
 void free_block(uint32_t block) {

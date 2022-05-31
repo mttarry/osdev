@@ -18,6 +18,7 @@
 # Preallocate pages
 .section .bss, "aw", @nobits
 	.align 4096
+.global boot_page_directory
 boot_page_directory:
 	.skip 4096
 boot_page_table1:

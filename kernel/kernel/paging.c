@@ -6,7 +6,7 @@ uint32_t *temp_mem;
 page_directory_t* page_directory;
 
 
-void * dumb_kmalloc(uint32_t size, int align) {
+void *dumb_kmalloc(uint32_t size, int align) {
     void * ret = temp_mem;
     // If it's not aligned, align it first
     if(align && !IS_ALIGNED(ret))
@@ -15,7 +15,16 @@ void * dumb_kmalloc(uint32_t size, int align) {
     return ret;
 }
 
-void clearPageDir() {
+
+void *virtual2phys(void *virtualaddr) {
+	uint32_t pdindex = PD_INDEX(virtualaddr);
+	uint32_t ptindex = PT_INDEX(virtualaddr);
+	uint32_t offset = PAGE_OFFSET(virtualaddr);
+
+	return 0;
+}
+
+void clear_pd() {
 	for (int i = 0; i < PAGING_STRUCTURE_SIZE; ++i) {
 		// flags: supervisor mode; r/w enable; not present
 		page_directory_entry_t entry;
@@ -24,21 +33,34 @@ void clearPageDir() {
 	}
 }
 
-// Map all 4 MB
-void addPageTable(uint32_t pageDirIdx) {
-	page_table_t page_table;
-	for (int i = 0; i < PAGING_STRUCTURE_SIZE; ++i) {
-		// frame is page start addr, supervisor level, read/write, present
-		page_table.tables[i].frame = (i * 0x1000);
-		page_table.tables[i].read_write = 1; 
-		page_table.tables[i].present = 1;
-	}
+page_directory_entry_t make_page_directory_entry(
+		void *page_table_physical_addr,
+		bool page_size,
+		bool cache_disable,
+		bool write_through,
+		bool present
+	) {
 
-	page_directory->tables[pageDirIdx].frame = ?
-	page_directory->tables[pageDirIdx].present = 1;
-	page_directory->tables[pageDirIdx].read_write = 1;
+	page_directory_entry_t entry;
+	entry.frame = (uint32_t)page_table_physical_addr >> 20;
+	entry.page_size = page_size;
+	entry.cache_disable = cache_disable;
+	entry.write_through = write_through;
+	entry.read_write = 1;
+	entry.present = present;
+
+	return entry;
 }
 
+void *page_table_virtual_address(uint16_t page_table_number) {
+	// first 10 bits set to 1 --> last PDE entry points to itself
+	void *va = 0xFFC00000;
+
+	// next 10 bits point into PD
+	va |= (page_table_number << PAGE_OFFSET_BITS);
+
+	return va;
+}
 
 void paging_init() {
 	// reserve paging structures after pfa bitmap
@@ -48,9 +70,34 @@ void paging_init() {
 
 	printf("Page dir at %p\n", page_directory);
 
-	clearPageDir();
+	clear_pd();
 
-	addPageTable(0);
+	void *page_dir_physical_addr = (void*)page_directory - VMA_BASE;
+	printf("Page dir physical address at %p\n", page_dir_physical_addr);
+
+	// recursively map the page directory to itself
+	// this allows us to access page table w/ virtual addr
+	page_directory->tables[1023] = make_page_directory_entry(
+									page_dir_physical_addr,
+									FOUR_KB,
+									false,
+									false,
+									true );
+
+
+	// allocate 4096 bytes for kernel page table
+	uint32_t *page_table_physical_address = allocate_block();
+	page_directory->tables[KERNEL_PAGE_NUMBER] = make_page_directory_entry(
+													page_table_physical_address,
+													FOUR_KB,
+													false,
+													false,
+													true);
+
+
+
+
+
 
 
 

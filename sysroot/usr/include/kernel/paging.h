@@ -2,17 +2,28 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <kernel/pfa.h>
+#include <stdbool.h>
+
 
 extern uint32_t* bitmap;
 extern uint32_t bitmap_size;
 extern uint32_t *mem_start;
 
-#define PAGE_SIZE 4096
-#define PAGING_STRUCTURE_SIZE 1024
 
-#define ALIGN(addr)				((((uint32_t)(addr) & 0xFFFFF000)) + 0x1000)
-#define IS_ALIGNED(addr)    	(((uint32_t)(addr)  & 0xFFF) == 0)
+#define PAGE_SIZE 					4096
+#define PAGING_STRUCTURE_SIZE 		1024
+#define VMA_BASE 					0xC0000000
+#define KERNEL_PAGE_NUMBER 			768
 
+#define FOUR_KB 					0
+#define FOUR_MB 					1
+
+#define ALIGN(addr)			   		((((uint32_t)(addr) & 0xFFFFF000)) + 0x1000)
+#define IS_ALIGNED(addr)       		(((uint32_t)(addr)  & 0xFFF) == 0)
+
+#define PD_INDEX(addr)         		((uint32_t)addr >> 22)
+#define PT_INDEX(addr)         		(((uint32_t)addr >> 12) & 0x3FF)
+#define PAGE_OFFSET(addr)      		((uint32_t)addr & 0x3FF)
 
 typedef struct page_directory_entry {
 	unsigned int present 		: 1;
@@ -49,5 +60,10 @@ typedef struct page_directory {
 	page_directory_entry_t tables[1024];
 } page_directory_t;
 
+extern page_directory_t boot_page_directory;
 
 void paging_init();
+void clear_pd();
+void *dumb_kmalloc(uint32_t size, int align);
+void *virtual2phys(void *virtualaddr);
+page_directory_entry_t make_page_directory_entry(void *page_table_physical_addr, bool page_size, bool cache_disable, bool write_through, bool present);
