@@ -14,7 +14,9 @@ void kernel_main() {
 	init_serial();
 
 	qemu_printf("Initializing page frame allocator...\n");
-	pfa_init(0x400000);
+	pfa_init(0x1000000);
 
 	paging_init();
+	
+	printf("Hello world\n");
 }

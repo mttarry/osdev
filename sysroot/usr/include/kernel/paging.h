@@ -23,7 +23,7 @@ extern uint32_t *mem_start;
 
 #define PD_INDEX(addr)         		((uint32_t)addr >> 22)
 #define PT_INDEX(addr)         		(((uint32_t)addr >> 12) & 0x3FF)
-#define PAGE_OFFSET(addr)      		((uint32_t)addr & 0x3FF)
+#define PAGE_OFFSET(addr)      		((uint32_t)addr & 0xFFF)
 
 typedef struct page_directory_entry {
 	unsigned int present 		: 1;
@@ -53,17 +53,15 @@ typedef struct page_table_entry {
 } page_table_entry_t;
 
 typedef struct page_table {
-	page_table_entry_t tables[1024];
+	page_table_entry_t pages[1024];
 } page_table_t;
 
 typedef struct page_directory {
 	page_directory_entry_t tables[1024];
+	page_table_t *ref_pt[1024]; // so we can access page tables directly
 } page_directory_t;
 
 extern page_directory_t boot_page_directory;
 
+page_directory_t *page_directory_init();
 void paging_init();
-void clear_pd();
-void *dumb_kmalloc(uint32_t size, int align);
-void *virtual2phys(void *virtualaddr);
-page_directory_entry_t make_page_directory_entry(void *page_table_physical_addr, bool page_size, bool cache_disable, bool write_through, bool present);
